@@ -68,6 +68,25 @@ criada). **Sempre use o alias `-latest`** (`gemini-flash-latest`, não uma vers�
 `GET https://generativelanguage.googleapis.com/v1beta/models?key=...` para ver quais
 modelos ela realmente tem acesso antes de assumir que é um problema de cota.
 
+### Pegadinha já conhecida: documentação oficial de portal de NFC-e pode estar errada
+
+A SEFAZ-PB anuncia `www.sefaz.pb.gov.br/nfce` como URL oficial, mas notas reais escaneadas em
+João Pessoa redirecionam pra `www4.sefaz.pb.gov.br` (balanceamento entre servidores
+numerados). **Não confie só na documentação/busca — quando o usuário tiver uma nota real em
+mãos, decodifique o QR code direto** (`pip install pyzbar pillow` + `apt-get install
+libzbar0t64` neste ambiente) pra ver a URL exata que o QR contém. O host real vira a fonte
+de verdade; a allowlist em `fetchNfce.ts` usa um padrão (`www\d*.sefaz.pb.gov.br`) em vez de
+um host fixo por causa disso. O mesmo vale pro path (`/nfce` vs `/nfce/consulta` — os dois
+aparecem em notas reais da mesma UF).
+
+## Design
+
+Skill de design instalada em [`.claude/skills/frontend-design/`](./.claude/skills/frontend-design)
+— usar pra qualquer trabalho novo de UI, não só recriar do zero a cada vez. Sistema de
+tokens atual (cores, tipografia) está em `apps/web/tailwind.config.js` e
+`apps/web/src/index.css` (classes `.btn-decide`, `.card`, `.field-input`, etc.) — reaproveitar
+em vez de estilizar componentes novos do zero.
+
 ## Trabalhando numa sessão remota/headless (deploy, provisionamento)
 
 Isso já mordeu a gente uma vez — documentando pra não se repetir.
