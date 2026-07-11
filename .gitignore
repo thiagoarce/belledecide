@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.wrangler/
+.env
+.env.local
+*.local
+.DS_Store
+coverage/
+.turbo/
+supabase/.branches/
+supabase/.temp/
