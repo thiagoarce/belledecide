@@ -4,6 +4,8 @@ build/
 .wrangler/
 .env
 .env.local
+.dev.vars
+.dev.vars.*
 *.local
 .DS_Store
 coverage/
