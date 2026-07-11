@@ -12,7 +12,7 @@ nasce de um documento em [`specs/`](./specs) antes de virar código.
 - **Front-end**: PWA em React + Vite, hospedado no Cloudflare Pages
 - **Back-end**: Cloudflare Workers (Hono), na borda
 - **Banco de dados**: Supabase (Postgres + Auth), multi-tenant por família com RLS
-- **IA**: Anthropic Claude, chamado a partir do Worker
+- **IA**: Gemini por padrão (tier gratuito) ou Anthropic Claude — trocável via env var, chamado a partir do Worker
 
 ## Estrutura
 

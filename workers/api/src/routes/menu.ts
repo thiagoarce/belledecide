@@ -2,13 +2,17 @@ import { Hono } from "hono";
 import type { Env } from "../env";
 import { requireAuth } from "../middleware/auth";
 import { supabaseAdmin } from "../lib/supabaseAdmin";
-import { ClaudeProvider, LLMRefusalError, LLMValidationError } from "../lib/llm/claudeProvider";
+import {
+  createLLMProvider,
+  LLMRefusalError,
+  LLMUnavailableError,
+  LLMValidationError,
+} from "../lib/llm/provider";
 import {
   MenuGenerationRequestSchema,
   type FamilyProfile,
   type PantryItem,
 } from "@belledecide/shared-types";
-import Anthropic from "@anthropic-ai/sdk";
 
 export const menuRoute = new Hono<{ Bindings: Env }>();
 
@@ -75,7 +79,7 @@ menuRoute.post("/generate", requireAuth, async (c) => {
     );
   }
 
-  const provider = new ClaudeProvider(c.env.ANTHROPIC_API_KEY, c.env.LLM_MODEL);
+  const provider = await createLLMProvider(c.env);
 
   try {
     const { output, model } = await provider.generateMenu({
@@ -117,10 +121,10 @@ menuRoute.post("/generate", requireAuth, async (c) => {
         500,
       );
     }
-    if (err instanceof Anthropic.RateLimitError || err instanceof Anthropic.InternalServerError) {
-      c.header("Retry-After", "5");
+    if (err instanceof LLMUnavailableError) {
+      c.header("Retry-After", String(err.retryAfterSeconds));
       return c.json(
-        { error: { code: "llm_unavailable", message: "Serviço de IA temporariamente indisponível" } },
+        { error: { code: "llm_unavailable", message: err.message } },
         503,
       );
     }

@@ -4,10 +4,16 @@ compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-LLM_MODEL = "claude-opus-4-8"
+# "anthropic" | "gemini" — ver src/lib/llm/provider.ts
+LLM_PROVIDER = "gemini"
+# Precisa bater com o provedor acima (ex: "gemini-2.0-flash" ou
+# "claude-opus-4-8"). Veja https://ai.google.dev/gemini-api/docs/models
+# para os modelos atuais com tier gratuito.
+LLM_MODEL = "gemini-2.0-flash"
 ALLOWED_ORIGIN = "http://localhost:5173"
 
 # Secrets (set via `wrangler secret put <NAME>`, never committed):
 #   SUPABASE_URL
 #   SUPABASE_SERVICE_ROLE_KEY
-#   ANTHROPIC_API_KEY
+#   GEMINI_API_KEY      (necessário se LLM_PROVIDER = "gemini")
+#   ANTHROPIC_API_KEY   (necessário se LLM_PROVIDER = "anthropic")

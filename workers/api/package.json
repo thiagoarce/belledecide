@@ -12,6 +12,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
     "@belledecide/shared-types": "workspace:*",
+    "@google/genai": "^2.11.0",
     "@supabase/supabase-js": "^2.45.4",
     "hono": "^4.6.9",
     "jose": "^5.9.6",

@@ -31,7 +31,9 @@ protegido por RLS — não passa pelo Worker).
 2. PWA chama `POST /v1/menu/generate` (autenticado) com `{ ideiaSemente }`.
 3. Worker busca `family_profile` e `estoque_casa` atual da família (service-role, filtrando
    por `family_id` resolvido do JWT).
-4. Worker monta o prompt (system prompt fixo + dados variáveis) e chama a API da Claude. O
+4. Worker monta o prompt (system prompt fixo + dados variáveis) e chama a API da LLM
+   configurada (Gemini por padrão, ou Claude — ver
+   [`adr/0004-llm-provider-adapter.md`](./adr/0004-llm-provider-adapter.md)). O
    texto retornado é parseado como JSON e validado contra o schema zod definido em
    [`api-contracts.md`](./api-contracts.md#post-v1menugenerate) (ver
    [`adr/0004-llm-provider-adapter.md`](./adr/0004-llm-provider-adapter.md) — a versão do

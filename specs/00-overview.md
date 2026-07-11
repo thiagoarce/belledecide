@@ -25,7 +25,7 @@ usa dados reais de consumo e preferências da família, não sugestões genéric
 | Hospedagem front-end | Cloudflare Pages |
 | Back-end | Cloudflare Workers (edge) |
 | Banco de dados | Supabase (PostgreSQL + Auth) |
-| Inteligência Artificial | Anthropic Claude (API), chamada a partir do Worker |
+| Inteligência Artificial | Gemini (default, tier gratuito) ou Anthropic Claude — trocável via `LLM_PROVIDER`, chamado a partir do Worker |
 
 Decisão de arquitetura: o front-end fala **diretamente com o Supabase** (via `supabase-js`,
 protegido por RLS) para todo CRUD simples. O Worker só entra em cena para as duas operações

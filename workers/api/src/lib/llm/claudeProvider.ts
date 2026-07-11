@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { ILLMProvider, MenuGenerationInput } from "./provider";
+import { LLMRefusalError, LLMUnavailableError, LLMValidationError } from "./provider";
 import { parseMenuOutput } from "./schemas";
 
 const SYSTEM_PROMPT = `Você é o "Belle decide", um assistente de inteligência doméstica.
@@ -35,18 +36,29 @@ export class ClaudeProvider implements ILLMProvider {
       perfil_familia: input.profile,
     });
 
-    const response = await this.client.messages.create({
-      model: this.model,
-      max_tokens: 8000,
-      system: [
-        {
-          type: "text",
-          text: SYSTEM_PROMPT,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [{ role: "user", content: userContent }],
-    });
+    let response;
+    try {
+      response = await this.client.messages.create({
+        model: this.model,
+        max_tokens: 8000,
+        system: [
+          {
+            type: "text",
+            text: SYSTEM_PROMPT,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
+        messages: [{ role: "user", content: userContent }],
+      });
+    } catch (err) {
+      if (err instanceof Anthropic.RateLimitError) {
+        throw new LLMUnavailableError(Number(err.headers?.get("retry-after")) || 5);
+      }
+      if (err instanceof Anthropic.InternalServerError || err instanceof Anthropic.APIConnectionError) {
+        throw new LLMUnavailableError();
+      }
+      throw err;
+    }
 
     if (response.stop_reason === "refusal") {
       throw new LLMRefusalError();
@@ -65,11 +77,3 @@ export class ClaudeProvider implements ILLMProvider {
     }
   }
 }
-
-export class LLMRefusalError extends Error {
-  constructor() {
-    super("A LLM recusou gerar o cardápio para esta requisição");
-  }
-}
-
-export class LLMValidationError extends Error {}

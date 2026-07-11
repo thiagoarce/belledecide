@@ -11,15 +11,15 @@ se o front-end fala direto com o Supabase via `supabase-js`.
 - **CRUD simples** (perfil da família, estoque manual, listar cardápios/eventos passados):
   front-end fala **direto com Supabase**, autenticado com o JWT do usuário, protegido por
   RLS (ADR 0002).
-- **Operações que exigem secrets ou lógica pesada** (chamar a API da Anthropic, buscar e
+- **Operações que exigem secrets ou lógica pesada** (chamar a API da LLM configurada, buscar e
   parsear NFC-e): passam pelo **Worker**, que usa a **service-role key** do Supabase
   (bypassa RLS) e filtra `family_id` explicitamente em toda query.
 
 ## Justificativa
 Rotear todo CRUD trivial pelo Worker adicionaria uma camada sem valor (o Worker viraria um
 proxy burro do PostgREST). Por outro lado, gerar cardápio e processar NFC-e exigem: chave de
-API que não pode existir no cliente, chamadas HTTP a terceiros (Anthropic, SEFAZ), e escrita
-multi-tabela que é mais simples de coordenar em código do que em RLS.
+API que não pode existir no cliente, chamadas HTTP a terceiros (Gemini/Anthropic, SEFAZ), e
+escrita multi-tabela que é mais simples de coordenar em código do que em RLS.
 
 ## Regra de ouro (aplicada em todo o código do Worker)
 Toda query que usa a service-role key **precisa filtrar por `family_id` resolvido no

@@ -52,7 +52,7 @@ da família autenticada.
 | `404` | Família não encontrada para o usuário (edge case — usuário sem membership) |
 | `422` | LLM recusou a geração (`stop_reason === "refusal"`) |
 | `500` | Resposta da LLM não é JSON válido ou não bateu com o schema zod esperado |
-| `503` | Erro transitório da API da Anthropic (rate limit / indisponibilidade) — inclui header `Retry-After` |
+| `503` | Erro transitório da API da LLM configurada (rate limit / indisponibilidade) — inclui header `Retry-After` |
 
 Corpo de erro padrão: `{ "error": { "code": "string", "message": "string" } }`.
 
