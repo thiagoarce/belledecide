@@ -23,6 +23,10 @@ export type FamilyProfile = z.infer<typeof FamilyProfileSchema>;
 
 export const PantryItemOrigemSchema = z.enum(["manual", "nfce", "ia"]);
 
+/** Épico 4: classificação de volume pra itens no congelador — ver specs/04-*.md. */
+export const VolumeCongeladorSchema = z.enum(["P", "M", "G"]);
+export type VolumeCongelador = z.infer<typeof VolumeCongeladorSchema>;
+
 export const PantryItemSchema = z.object({
   id: z.string().uuid().optional(),
   familyId: z.string().uuid(),
@@ -31,6 +35,7 @@ export const PantryItemSchema = z.object({
   quantidade: z.number().nonnegative(),
   unidadeMedida: z.string().nullable(),
   validade: z.string().date().nullable().optional(),
+  volumeCongelador: VolumeCongeladorSchema.nullable().optional(),
   origem: PantryItemOrigemSchema,
 });
 export type PantryItem = z.infer<typeof PantryItemSchema>;
@@ -41,10 +46,57 @@ export const CreatePantryItemSchema = z.object({
   quantidade: z.number().positive(),
   unidadeMedida: z.string().nullable().optional(),
   validade: z.string().date().nullable().optional(),
+  volumeCongelador: VolumeCongeladorSchema.nullable().optional(),
 }).refine((v) => Boolean(v.produtoId || v.nomeLivre), {
   message: "produtoId ou nomeLivre é obrigatório",
 });
 export type CreatePantryItem = z.infer<typeof CreatePantryItemSchema>;
+
+// ── Épico 3: Assistente de Supermercado ─────────────────────────────────
+
+export const ProdutoSchema = z.object({
+  id: z.string().uuid(),
+  codigoBarras: z.string().nullable(),
+  nomeNormalizado: z.string(),
+  categoria: z.string().nullable(),
+  unidadePadrao: z.string().nullable(),
+});
+export type Produto = z.infer<typeof ProdutoSchema>;
+
+export const HistoricoPrecoSchema = z.object({
+  id: z.string().uuid().optional(),
+  familyId: z.string().uuid(),
+  produtoId: z.string().uuid(),
+  mercadoNome: z.string(),
+  mercadoCnpj: z.string().nullable().optional(),
+  precoPago: z.number().nonnegative(),
+  observadoEm: z.string().optional(),
+});
+export type HistoricoPreco = z.infer<typeof HistoricoPrecoSchema>;
+
+export const SemaforoCorSchema = z.enum(["verde", "amarelo", "vermelho", "sem_dado"]);
+export type SemaforoCor = z.infer<typeof SemaforoCorSchema>;
+
+// ── Épico 5: Roteirizador de Eventos ────────────────────────────────────
+
+export const EventoSchema = z.object({
+  id: z.string().uuid().optional(),
+  familyId: z.string().uuid(),
+  nome: z.string().min(1),
+  dataEvento: z.string().date().nullable().optional(),
+  tipo: z.string().nullable().optional(),
+});
+export type Evento = z.infer<typeof EventoSchema>;
+
+export const EventoItemSchema = z.object({
+  id: z.string().uuid().optional(),
+  eventoId: z.string().uuid(),
+  descricao: z.string().min(1),
+  quantidade: z.string().nullable().optional(),
+  localSugerido: z.string().nullable().optional(),
+  comprado: z.boolean().default(false),
+});
+export type EventoItem = z.infer<typeof EventoItemSchema>;
 
 // ── Épico 2: Geração de cardápio (POST /v1/menu/generate) ──────────────
 

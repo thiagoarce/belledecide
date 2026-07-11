@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { CalendarDays, ShoppingBasket, ListChecks } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
+import { PageHeader } from "../../components/PageHeader";
 import type { MenuGenerationResponse } from "@belledecide/shared-types";
 
 type Tab = "cardapio" | "lista" | "guia";
+
+const TABS = [
+  { key: "cardapio", label: "Cardápio", icon: CalendarDays },
+  { key: "lista", label: "Lista", icon: ShoppingBasket },
+  { key: "guia", label: "Guia", icon: ListChecks },
+] as const;
 
 async function fetchMenu(id: string): Promise<MenuGenerationResponse> {
   const { data, error } = await supabase
@@ -35,64 +43,74 @@ export function MenuResultPage() {
     enabled: !stateResult,
   });
 
-  if (!data) return <p className="p-6 text-stone-500">Carregando cardápio…</p>;
+  if (!data) return <p className="p-6 font-sans text-giz">Carregando cardápio…</p>;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-4 text-xl font-semibold text-stone-900">Seu cardápio</h1>
+    <div>
+      <PageHeader eyebrow="A Belle decidiu" title="Seu cardápio" />
 
-      <div className="mb-4 flex gap-1 rounded-md bg-stone-100 p-1 text-sm">
-        {(
-          [
-            ["cardapio", "Cardápio"],
-            ["lista", "Lista de compras"],
-            ["guia", "Guia de execução"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`flex-1 rounded px-3 py-1.5 font-medium ${
-              tab === key ? "bg-white text-violet-800 shadow-sm" : "text-stone-500"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="px-5">
+        {/* Fichário: abas como cartões de índice, a ativa "puxada" pra frente */}
+        <div className="flex gap-1">
+          {TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-t-lg border border-b-0 px-2 py-2.5 font-sans text-xs font-bold transition ${
+                tab === key
+                  ? "border-azulejo-100 bg-white text-azulejo-700"
+                  : "border-transparent bg-transparent text-giz hover:text-azulejo-600"
+              }`}
+            >
+              <Icon size={14} /> {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="rounded-b-xl rounded-tr-xl border border-azulejo-100 bg-white p-4">
+          {tab === "cardapio" && (
+            <ul className="space-y-3">
+              {data.cardapio.map((dia, idx) => (
+                <li key={idx} className="border-l-2 border-manga pl-3">
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-wide text-azulejo-600">
+                    Dia {dia.dia}
+                  </p>
+                  <p className="font-display text-base text-noite">{dia.refeicao}</p>
+                  <p className="mt-0.5 font-sans text-sm text-giz">
+                    {dia.ingredientes_usados.join(", ")}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {tab === "lista" && (
+            <ul className="divide-y divide-linho">
+              {data.lista_compras.map((item, idx) => (
+                <li key={idx} className="flex items-center justify-between py-2.5">
+                  <span className="font-sans text-sm text-grafite">{item.item}</span>
+                  <span className="font-mono text-xs text-giz">
+                    {item.quantidade} · {item.setor}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {tab === "guia" && (
+            <ol className="space-y-3">
+              {data.guia_execucao.map((passo, idx) => (
+                <li key={idx} className="flex gap-3">
+                  <span className="font-mono text-sm font-bold text-manga">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-sans text-sm text-grafite">{passo}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
       </div>
-
-      {tab === "cardapio" && (
-        <ul className="space-y-2">
-          {data.cardapio.map((dia, idx) => (
-            <li key={idx} className="rounded-md border border-stone-200 bg-white p-3">
-              <p className="text-xs font-medium text-violet-700">Dia {dia.dia}</p>
-              <p className="font-medium text-stone-900">{dia.refeicao}</p>
-              <p className="text-sm text-stone-500">{dia.ingredientes_usados.join(", ")}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {tab === "lista" && (
-        <ul className="divide-y divide-stone-200 rounded-md border border-stone-200 bg-white">
-          {data.lista_compras.map((item, idx) => (
-            <li key={idx} className="flex items-center justify-between p-3 text-sm">
-              <span>{item.item}</span>
-              <span className="text-stone-500">
-                {item.quantidade} · {item.setor}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {tab === "guia" && (
-        <ol className="list-decimal space-y-2 pl-5 text-sm text-stone-700">
-          {data.guia_execucao.map((passo, idx) => (
-            <li key={idx}>{passo}</li>
-          ))}
-        </ol>
-      )}
     </div>
   );
 }

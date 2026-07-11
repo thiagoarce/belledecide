@@ -2,6 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-stone-50 text-stone-900;
+@layer base {
+  body {
+    @apply bg-linho text-grafite font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-noite;
+  }
+
+  /* Foco visível — acessibilidade, nunca removido */
+  :focus-visible {
+    outline: 2px solid theme("colors.manga.DEFAULT");
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Padrão de ladrilho — usado com moderação, só como assinatura visual em
+     cabeçalhos e estados vazios. Geometria simples inspirada em azulejo
+     colonial português, não decoração genérica. */
+  .azulejo-pattern {
+    background-color: theme("colors.noite");
+    background-image:
+      linear-gradient(45deg, theme("colors.azulejo.700") 25%, transparent 25%),
+      linear-gradient(-45deg, theme("colors.azulejo.700") 25%, transparent 25%);
+    background-size: 24px 24px;
+    background-position:
+      0 0,
+      0 12px;
+  }
+
+  /* Botão de "decisão" — a única cor saturada do sistema, reservada pro
+     momento em que o app resolve algo por você. */
+  .btn-decide {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-manga px-5 py-3
+      font-sans font-bold text-white shadow-sm transition
+      hover:bg-manga-700 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-quiet {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-azulejo-100
+      bg-white px-4 py-2.5 font-sans font-medium text-azulejo-700 transition
+      hover:bg-azulejo-50 disabled:opacity-50;
+  }
+
+  .card {
+    @apply rounded-xl border border-azulejo-100 bg-white shadow-sm;
+  }
+
+  .field-label {
+    @apply block font-sans text-sm font-medium text-grafite;
+  }
+
+  .field-input {
+    @apply mt-1 w-full rounded-lg border border-azulejo-100 bg-white px-3 py-2.5 font-sans
+      text-sm text-grafite placeholder:text-giz focus:border-azulejo-600 focus:outline-none;
+  }
 }

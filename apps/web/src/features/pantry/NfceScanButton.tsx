@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
 import { useQueryClient } from "@tanstack/react-query";
+import { ScanLine, X } from "lucide-react";
 import { apiFetch, ApiError } from "../../lib/apiClient";
 import type { NfceScanResponse } from "@belledecide/shared-types";
 
@@ -60,33 +61,38 @@ export function NfceScanButton() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-md border border-violet-300 bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-800 hover:bg-violet-100"
-      >
-        Escanear nota fiscal
+      <button onClick={() => setOpen(true)} className="btn-decide">
+        <ScanLine size={16} /> Escanear nota
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-noite/80 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-stone-800">Escanear QR code da nota</h2>
-              <button onClick={close} className="text-stone-400 hover:text-stone-700">
-                Fechar
+              <h2 className="font-display text-base text-noite">QR code da nota</h2>
+              <button
+                onClick={close}
+                aria-label="Fechar"
+                className="rounded-full p-1 text-giz hover:bg-linho hover:text-grafite"
+              >
+                <X size={18} />
               </button>
             </div>
 
             {status === "scanning" && (
-              <video ref={videoRef} className="w-full rounded-md bg-black" muted playsInline />
+              <div className="overflow-hidden rounded-xl border-2 border-azulejo-600">
+                <video ref={videoRef} className="w-full bg-noite" muted playsInline />
+              </div>
             )}
-            {status === "processing" && <p className="text-sm text-stone-600">Processando nota…</p>}
-            {status === "error" && <p className="text-sm text-red-600">{error}</p>}
+            {status === "processing" && (
+              <p className="font-sans text-sm text-giz">Consultando a nota na SEFAZ…</p>
+            )}
+            {status === "error" && <p className="font-sans text-sm text-manga-700">{error}</p>}
             {status === "done" && result && (
-              <div className="text-sm text-stone-700">
+              <div className="font-sans text-sm text-grafite">
                 {result.status === "parsed" || result.status === "partial" ? (
                   <p>
-                    {result.itens.length} item(ns) importado(s) para o estoque
+                    {result.itens.length} item(ns) foram pro estoque
                     {result.itensNaoReconhecidos > 0
                       ? ` (${result.itensNaoReconhecidos} sem correspondência no catálogo)`
                       : ""}
@@ -95,10 +101,7 @@ export function NfceScanButton() {
                 ) : (
                   <p>{result.message ?? "Nota processada."}</p>
                 )}
-                <button
-                  onClick={close}
-                  className="mt-3 rounded-md bg-stone-800 px-3 py-1.5 text-sm font-medium text-white"
-                >
+                <button onClick={close} className="btn-decide mt-3 w-full">
                   OK
                 </button>
               </div>

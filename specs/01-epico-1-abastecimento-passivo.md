@@ -66,7 +66,12 @@ Essa série temporal por produto/mercado é a base do "Semáforo de Preço" do �
 ## Fora de escopo nesta fase
 
 - Scanner de EAN na prateleira (isso é Épico 3).
-- Cobertura de todas as 27 UFs — começamos por São Paulo e o ambiente SVRS (compartilhado
-  por diversos estados menores); demais UFs entram incrementalmente.
+- Cobertura de todas as 27 UFs — começamos por São Paulo, o ambiente SVRS (compartilhado
+  por diversos estados menores) e Paraíba (portal próprio, `sefaz.pb.gov.br` — prioridade
+  por ser onde o app está sendo testado inicialmente); demais UFs entram incrementalmente.
+  O parser de PB não foi validado contra uma nota real (o ambiente de desenvolvimento não
+  conseguiu alcançar o domínio para inspecionar o HTML ao vivo) — assume o mesmo template
+  "Consulta Pública Simplificada" usado por SP/SVRS; a primeira nota real escaneada em
+  produção é o teste de verdade.
 - Correção assistida por IA de itens não reconhecidos (fica como melhoria futura; nesta fase
   o matching é heurístico via `pg_trgm`, sem LLM).

@@ -11,7 +11,25 @@ const ALLOWED_HOSTS = new Set([
   // Ambiente SVRS (compartilhado por diversos estados menores)
   "nfce.svrs.rs.gov.br",
   "www.sefaz.rs.gov.br",
+  // Paraíba — portal próprio, não é SVRS. QR codes reais usam http:// (não
+  // https), por isso o protocolo não é restringido abaixo.
+  "www.sefaz.pb.gov.br",
+  "sefaz.pb.gov.br",
 ]);
+
+/**
+ * PB balanceia QR codes reais entre vários subdomínios numerados
+ * (www2/www3/www4.sefaz.pb.gov.br...) — confirmado escaneando uma nota real
+ * em João Pessoa em 2026-07, que apontava para www4, não para www. como a
+ * documentação oficial da SEFAZ sugeria. O padrão é restrito (só "www" +
+ * dígitos opcionais + o domínio exato), então continua sendo uma allowlist,
+ * não um wildcard genérico.
+ */
+const PB_HOST_PATTERN = /^www\d*\.sefaz\.pb\.gov\.br$/;
+
+function isHostAllowed(hostname: string): boolean {
+  return ALLOWED_HOSTS.has(hostname) || PB_HOST_PATTERN.test(hostname);
+}
 
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_RESPONSE_BYTES = 2_000_000;
@@ -27,7 +45,9 @@ export async function fetchNfceHtml(qrUrl: string): Promise<{ html: string; url:
     throw new HostNotAllowedError("URL do QR code inválida");
   }
 
-  if (url.protocol !== "https:" || !ALLOWED_HOSTS.has(url.hostname)) {
+  // Alguns portais estaduais (ex: PB) ainda emitem QR codes com http:// —
+  // a defesa contra SSRF está na allowlist de host, não no protocolo.
+  if ((url.protocol !== "https:" && url.protocol !== "http:") || !isHostAllowed(url.hostname)) {
     throw new HostNotAllowedError(`Host não permitido: ${url.hostname}`);
   }
 
