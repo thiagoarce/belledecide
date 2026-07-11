@@ -6,10 +6,12 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 # "anthropic" | "gemini" — ver src/lib/llm/provider.ts
 LLM_PROVIDER = "gemini"
-# Precisa bater com o provedor acima (ex: "gemini-2.0-flash" ou
-# "claude-opus-4-8"). Veja https://ai.google.dev/gemini-api/docs/models
-# para os modelos atuais com tier gratuito.
-LLM_MODEL = "gemini-2.0-flash"
+# Precisa bater com o provedor acima (ex: "gemini-flash-latest" ou
+# "claude-opus-4-8"). Usamos o alias "-latest" do Gemini de propósito —
+# o Google descontinua versões específicas (ex: gemini-2.0-flash,
+# gemini-2.5-flash) para novos usuários periodicamente; o alias sempre
+# resolve para o Flash atual. Veja https://ai.google.dev/gemini-api/docs/models
+LLM_MODEL = "gemini-flash-latest"
 ALLOWED_ORIGIN = "https://belledecide.pages.dev"
 
 # Secrets (set via `wrangler secret put <NAME>`, never committed):

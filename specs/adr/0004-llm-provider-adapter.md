@@ -23,7 +23,7 @@ interface ILLMProvider {
 próprio SDK para esses três, então a rota nunca importa um SDK de LLM diretamente. A escolha
 de provedor é resolvida em runtime por `createLLMProvider(env)`, com base na env var
 `LLM_PROVIDER` (`"gemini"` | `"anthropic"`, default `"gemini"`); o modelo específico vem de
-`LLM_MODEL` (precisa bater com o provedor selecionado, ex: `gemini-2.0-flash` ou
+`LLM_MODEL` (precisa bater com o provedor selecionado, ex: `gemini-flash-latest` ou
 `claude-opus-4-8`).
 
 Implementações:
@@ -56,3 +56,9 @@ exatamente para que essa troca continue sendo indolor.
   texto). Isso é intencional: cada provider pode precisar formatá-lo diferente (ex:
   `systemInstruction` do Gemini vs. bloco `system` com `cache_control` do Claude) — manter
   uma "fonte única" forçaria uma abstração prematura sobre um texto que raramente muda.
+- **`LLM_MODEL` deve usar o alias `-latest` do Gemini quando disponível**
+  (`gemini-flash-latest`, não `gemini-2.0-flash`/`gemini-2.5-flash`). O Google descontinua
+  acesso de novos usuários a versões específicas do modelo com frequência maior do que o
+  esperado (`gemini-2.0-flash` parou de ter cota gratuita, `gemini-2.5-flash` retornou 404
+  "no longer available to new users" — ambos observados no mesmo dia em que a chave foi
+  criada). O alias absorve essa troca sem precisar de deploy.
